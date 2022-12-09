@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Setto</title>
+    <link rel="stylesheet" href="css/index.css" />
+    <link rel="stylesheet" href="css/fonts.css" />
+    <link rel="stylesheet" href="css/loading.css" />
+    <link rel="stylesheet" href="css/button.css" />
+  </head>
+  <body style="color-scheme: dark">
+    
+
+    <!-- Video lookup section -->
+    <div id="search">
+      <h1>Welcome!</h1>
+      <input type="text" placeholder="Enter a YouTube URL" id="search link" autofocus/>
+      <button class="button" onclick="getVideo()">Download</button>
+    </div>
+
+    <!-- Sections/Flow -->
+
+    <!-- Recent vids container -->
+    <h1 id="video title">Recent Vids</h1>
+    <div id="recent container">
+    </div>
+    <button class="button" onclick="clearList()">Clear</button>
+
+    <!-- Loading section -->
+    <div id="loading container" hidden>
+      <div
+        class="loading icon"
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        "
+      >
+        <svg viewBox="0 0 100 100">
+          <defs>
+            <filter id="shadow">
+              <feDropShadow
+                dx="0"
+                dy="0"
+                stdDeviation="1.5"
+                flood-color="#fc6767"
+              />
+            </filter>
+          </defs>
+          <circle
+            id="spinner"
+            style="
+              fill: transparent;
+              stroke: #ff0000;
+              stroke-width: 7px;
+              stroke-linecap: round;
+              filter: url(#shadow);
+            "
+            cx="50"
+            cy="50"
+            r="45"
+          />
+        </svg>
+      </div>
+      <h1 style="text-align: center">Fetching</h1>
+    </div>
+
+  </body>
+  <script src="js/backend.js"></script>
+</html>
