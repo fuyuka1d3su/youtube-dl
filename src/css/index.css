@@ -1,6 +1,5 @@
 body {
   margin: auto;
-  max-width: 1200px;
   padding: 2rem;
   color-scheme: dark;
   background-color: #1a1a1a;
@@ -20,10 +19,10 @@ h3 {
   font-size: 20px;
   color: #fff;
 }
-h4 {
+p {
   font-family: Poppins-Light;
-  font-size: 15px;
-  color: #fff;
+  font-size: 17px;
+  color: #919191;
 }
 input {
   width: 80%;
@@ -31,18 +30,23 @@ input {
   padding: 12px 20px;
   font-family: Poppins-Regular;
   font-size: 15px;
-  transition-duration: 0.3s;
   border-radius: 15px;
-  border: none;
+  border: 2px solid transparent;
+  transition: border 0.2s;
 }
 input:hover {
-  border: 2px solid #ffffff;
+  border: 2px solid white;
 }
-.listContainer {
-  opacity: 80%;
-  transition-duration: 0.3s;
+
+.column {
+  float: left;
+  width: auto;
 }
-.listContainer:hover {
-  box-shadow: rgba(0, 0, 0, 0.11) 0 8px 15px;
-  opacity: 100%;
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+* {
+  color-scheme: dark;
 }
