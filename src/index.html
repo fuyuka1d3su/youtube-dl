@@ -7,31 +7,15 @@
     <link rel="stylesheet" href="css/fonts.css" />
     <link rel="stylesheet" href="css/loading.css" />
     <link rel="stylesheet" href="css/button.css" />
+    <link rel="stylesheet" href="css/smallButton.css" />
+    <link rel="stylesheet" href="css/recentVideo.css" />
   </head>
-  <body style="color-scheme: dark">
-    
-
-    <!-- Video lookup section -->
-    <div id="search">
-      <h1>Welcome!</h1>
-      <input type="text" placeholder="Enter a YouTube URL" id="search link" autofocus/>
-      <button class="button" onclick="getVideo()">Download</button>
-    </div>
-
-    <!-- Sections/Flow -->
-
-    <!-- Recent vids container -->
-    <h1 id="video title">Recent Vids</h1>
-    <div id="recent container">
-    </div>
-    <button class="button" onclick="clearList()">Clear</button>
-
-    <!-- Loading section -->
-    <div id="loading container" hidden>
+  <body>
+    <div id="loading container" class="loading container" style="display: none">
       <div
         class="loading icon"
         style="
-          position: absolute;
+          position: relative;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
@@ -44,7 +28,7 @@
                 dx="0"
                 dy="0"
                 stdDeviation="1.5"
-                flood-color="#fc6767"
+                flood-color="#4800ff"
               />
             </filter>
           </defs>
@@ -52,7 +36,7 @@
             id="spinner"
             style="
               fill: transparent;
-              stroke: #ff0000;
+              stroke: #4800ff;
               stroke-width: 7px;
               stroke-linecap: round;
               filter: url(#shadow);
@@ -63,9 +47,33 @@
           />
         </svg>
       </div>
-      <h1 style="text-align: center">Fetching</h1>
     </div>
 
+    <!-- Video lookup section -->
+    <div id="search">
+      <img src="./assets/icon.png" alt="" height="50px" />
+      <br />
+      <br />
+      <input
+        type="text"
+        placeholder="Enter the YouTube URL of a video to download"
+        id="search link"
+        autofocus
+      />
+      <br />
+      <br />
+      <button class="button" onclick="getVideo()">Search</button>
+      <!-- Loading section -->
+    </div>
+
+    <!-- Sections/Flow -->
+
+    <!-- Recent vids container -->
+    <br />
+    <h1 id="video title">Recent Vids</h1>
+    <button class="button" onclick="clearList()">Clear</button>
+    <p id="video empty"></p>
+    <div id="recent container"></div>
   </body>
   <script src="js/backend.js"></script>
 </html>
