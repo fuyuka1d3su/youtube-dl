@@ -6,10 +6,15 @@ const {
   nativeTheme,
 } = require("electron");
 const path = require("path");
+const fs = require("fs");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   app.quit();
+}
+
+if (!fs.existsSync(path.join(__dirname, "json/recentvids.json"))) {
+  fs.writeFile(path.join(__dirname, "json/recentvids.json"), "[]");
 }
 
 const createWindow = () => {
