@@ -3,6 +3,12 @@ const fs = require("fs");
 const path = require("path");
 const { ipcRenderer } = require("electron");
 const currentDate = new Date().valueOf();
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const ffprobePath = require("@ffprobe-installer/ffprobe").path;
+const ffmpeg = require("fluent-ffmpeg");
+const tempDir = require("os").tmpdir() + "\\" + "setto\\";
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 showRecentVids();
 
@@ -42,13 +48,7 @@ function getVideo() {
 
 function showRecentVids() {
   const recentVidListContainer = document.getElementById("recent container");
-  let title;
-  let img;
-  let channelAndTimestamp;
-  let openDirectory;
-  let openInBrowser;
-  let copyLinkVid;
-  let deleteVideoButton;
+
   let recentVids = readRecentVids();
 
   if (recentVids.length == 0) {
@@ -60,9 +60,17 @@ function showRecentVids() {
 
       console.log(vid);
       const recentVidContainer = document.createElement("div");
-      const downloadMergedButton = document.createElement("button");
-      const downloadAudioOnlyButton = document.createElement("button");
-      const downloadVideoOnlyButton = document.createElement("button");
+      let downloadMergedButton = document.createElement("button");
+      let downloadAudioOnlyButton = document.createElement("button");
+      let downloadVideoOnlyButton = document.createElement("button");
+
+      let title;
+      let img;
+      let channelAndTimestamp;
+      // let openDirectory;
+      // let openInBrowser;
+      // let copyLinkVid;
+      // let deleteVideoButton;
       let columnDiv = document.createElement("div");
 
       recentVidContainer.className = "recentVid container";
@@ -99,11 +107,10 @@ function showRecentVids() {
       columnDiv.append(channelAndTimestamp);
 
       columnDiv.append(document.createElement("br"));
-      columnDiv.append(document.createElement("br"));
 
       // Open directory in explorer
 
-      openDirectory = document.createElement("button");
+      let openDirectory = document.createElement("button");
       img = document.createElement("img");
       openDirectory.onclick = () => open(path.dirname(vid.path));
       openDirectory.className = "recentVid smallImgButton";
@@ -115,9 +122,12 @@ function showRecentVids() {
 
       // Open URL in browser
 
-      openInBrowser = document.createElement("button");
+      let openInBrowser = document.createElement("button");
       img = document.createElement("img");
-      openInBrowser.onclick = () => open(vid.url);
+      openInBrowser.onclick = function () {
+        console.log(vid.url);
+        open(vid.url);
+      };
       openInBrowser.className = "recentVid smallImgButton";
 
       img.src = "./assets/open.png";
@@ -127,12 +137,12 @@ function showRecentVids() {
 
       // Copy Button
 
-      copyLinkVid = document.createElement("button");
+      let copyLinkVid = document.createElement("button");
       img = document.createElement("img");
       copyLinkVid.onclick = function () {
         navigator.clipboard.writeText(vid.url);
+        console.log("wrote " + vid.url + "to clipboard");
         copyLinkVid.style.border = "2px solid rgb(23, 201, 0)";
-        sleep(500);
         copyLinkVid.style.border = "2px solid rgb(61, 0, 117)";
       };
       copyLinkVid.className = "recentVid smallImgButton";
@@ -144,7 +154,7 @@ function showRecentVids() {
 
       // Delete vid button
 
-      deleteVideoButton = document.createElement("button");
+      let deleteVideoButton = document.createElement("button");
       img = document.createElement("img");
       deleteVideoButton.onclick = () => {
         deleteVideoButton.style.border = "2px solid red";
@@ -163,7 +173,7 @@ function showRecentVids() {
       downloadMergedButton.innerHTML = "Audio + Video";
       downloadMergedButton.className = "recentVid download";
       downloadMergedButton.onclick = () =>
-        downloadVideoMerged(vid, viewVidOnYT);
+        downloadVideoMerged(vid, downloadMergedButton);
       columnDiv.append(downloadMergedButton);
 
       // Download audio only button
@@ -280,34 +290,18 @@ function writeVideo(video) {
 }
 
 function downloadAudioOnly(videoToDL, downloadButton) {
+  downloadButton.style.border = "2px solid grey";
+  // gets the best video using yt-dlp and returns the path it saved it to
   ipcRenderer
     .invoke("showSaveDialog", {
-      defaultPath: "~/" + videoToDL.title + ".flac",
+      defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".flac",
     })
     .then((p) => {
-      let directory = path.dirname(p);
+      if (p) {
+        getBestAudio(videoToDL, p).then(() => {
+          downloadButton.style.border = "2px solid grey";
+          let directory = path.dirname(p);
 
-      downloadButton.style.border = "2px solid grey";
-
-      youtubedl(videoToDL.url, {
-        resizeBuffer: true,
-        format: "ba",
-        extractAudio: true,
-        ffmpegLocation:
-          "C:\\Users\\akihito\\Documents\\Youtube\\setto\\ffmpeg-bin\\ffmpeg.exe",
-        verbose: true,
-        resizeBuffer: true,
-        addMetadata: true,
-        audioFormat: "flac",
-        embedThumbnail: true,
-        output: p,
-      })
-        .catch(function (error) {
-          console.log(error);
-          downloadButton.style.border = "2px solid red";
-          return;
-        })
-        .then(() => {
           downloadButton.style.border = "2px solid rgb(23, 201, 0)";
           let recentVids = readRecentVids();
 
@@ -325,89 +319,172 @@ function downloadAudioOnly(videoToDL, downloadButton) {
 
           open(directory);
         });
+      } else {
+        console.log("no path found");
+      }
     });
 }
 
 function downloadVideoOnly(videoToDL, downloadButton) {
+  downloadButton.style.border = "2px solid grey";
+  // gets the best video using yt-dlp and returns the path it saved it to
+  ipcRenderer
+    .invoke("showSaveDialog", {
+      defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".flac",
+    })
+    .then((p) => {
+      if (p) {
+        getBestVideo(videoToDL, p).then(() => {
+          downloadButton.style.border = "2px solid grey";
+          let directory = path.dirname(p);
+
+          downloadButton.style.border = "2px solid rgb(23, 201, 0)";
+          let recentVids = readRecentVids();
+
+          for (var vid of recentVids) {
+            if (vid.id == videoToDL.id) {
+              vid.path = p;
+              break;
+            }
+          }
+
+          fs.writeFileSync(
+            path.join(__dirname, "/json/recentvids.json"),
+            JSON.stringify(recentVids)
+          );
+
+          open(directory);
+        });
+      } else {
+        console.log("no path found");
+      }
+    });
+}
+
+function getBestVideo(video, p) {
+  return new Promise(function (resolve, reject) {
+    youtubedl(video.url, {
+      output: p,
+      resizeBuffer: true,
+      format: "bv",
+      ffmpegLocation:
+        "C:\\Users\\akihito\\Documents\\Youtube\\setto\\ffmpeg-bin\\ffmpeg.exe",
+      verbose: true,
+      addMetadata: true,
+    })
+      .catch(function (error) {
+        console.log(error);
+        reject(false);
+      })
+      .then(() => {
+        resolve(true);
+      });
+  });
+}
+
+function getBestAudio(video, p) {
+  return new Promise(function (resolve, reject) {
+    youtubedl(video.url, {
+      resizeBuffer: true,
+      format: "ba",
+      extractAudio: true,
+      ffmpegLocation:
+        "C:\\Users\\akihito\\Documents\\Youtube\\setto\\ffmpeg-bin\\ffmpeg.exe",
+      verbose: true,
+      resizeBuffer: true,
+      addMetadata: true,
+      audioFormat: "flac",
+      embedThumbnail: true,
+      output: p,
+    })
+      .catch(function (error) {
+        console.log(error);
+        reject(false);
+      })
+      .then(() => {
+        resolve(true);
+      });
+  });
+}
+
+function downloadVideoMerged(videoToDL, downloadButton) {
+  downloadButton.style.border = "2px solid grey";
+  let videoFile;
+  let audioFile;
+  let outputName;
+
   ipcRenderer
     .invoke("showSaveDialog", {
       defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".mp4",
     })
     .then((p) => {
-      let directory = path.dirname(p);
+      outputName = path.basename(p);
+      dirName = path.dirname(p);
 
-      downloadButton.style.border = "2px solid grey";
+      getBestAudio(videoToDL, tempDir + "audio_" + videoToDL.id + ".flac").then(
+        () => {
+          audioFile = tempDir + "audio_" + videoToDL.id + ".flac";
+          console.log(audioFile);
+          getBestVideo(
+            videoToDL,
+            tempDir + "video_" + videoToDL.id + ".mp4"
+          ).then(() => {
+            videoFile = tempDir + "video_" + videoToDL.id + ".mp4";
+            console.log(videoFile);
 
-      youtubedl(videoToDL.url, {
-        output: p,
-        resizeBuffer: true,
-        format: "bv",
-      })
-        .catch(function (error) {
-          console.log(error);
-          downloadButton.style.border = "2px solid red";
-          return;
-        })
-        .then(() => {
-          downloadButton.style.border = "2px solid rgb(23, 201, 0)";
-          let recentVids = readRecentVids();
+            // once both the video and audio files were downloaded
+            // ffmpeg.exe -i videoFile -i audioFile -c copy -map 0:v:0 -map 1:a:0 p
+            let err = false;
+            var cmd = ffmpeg()
+              .addInput(videoFile)
+              .addInput(audioFile)
+              .addOptions("-strict -2")
+              .output(p)
+              .outputOptions(["-c copy", "-map 0:v:0", "-map 1:a:0"])
+              .on("start", function (commandLine) {
+                console.log("Spawned Ffmpeg with command: " + commandLine);
+              })
+              .on("error", function (err) {
+                console.log(err);
+                err = true;
+              })
+              .on("end", () => {
+                fs.rm(
+                  tempDir,
+                  {
+                    recursive: true,
+                    force: true,
+                  },
+                  (err) => {
+                    console.log(err);
+                  }
+                ); // removes the temp dir
 
-          for (var vid of recentVids) {
-            if (vid.id == videoToDL.id) {
-              vid.path = p;
-              break;
-            }
-          }
+                if (err) {
+                  downloadButton.style.border = "2px solid red";
+                } else {
+                  downloadButton.style.border = "2px solid rgb(23, 201, 0)";
 
-          fs.writeFileSync(
-            path.join(__dirname, "/json/recentvids.json"),
-            JSON.stringify(recentVids)
-          );
+                  let recentVids = readRecentVids();
 
-          open(directory);
-        });
-    });
-}
+                  for (var vid of recentVids) {
+                    if (vid.id == videoToDL.id) {
+                      vid.path = p;
+                      break;
+                    }
+                  }
 
-function downloadVideoMerged(videoToDL, downloadButton) {
-  ipcRenderer
-    .invoke("showSaveDialog", {
-      defaultPath: "~/" + videoToDL.id + ".mp4",
-    })
-    .then((p) => {
-      let directory = path.dirname(p);
-
-      downloadButton.style.border = "2px solid grey";
-
-      youtubedl(videoToDL.url, {
-        output: p,
-        resizeBuffer: true,
-        //format: "bv+ba/b",
-        downloader: "http" + ffmpeg.path,
-      })
-        .catch(function (error) {
-          console.log(error);
-          downloadButton.style.border = "2px solid red";
-          return;
-        })
-        .then(() => {
-          downloadButton.style.border = "2px solid rgb(23, 201, 0)";
-          let recentVids = readRecentVids();
-
-          for (var vid of recentVids) {
-            if (vid.id == videoToDL.id) {
-              vid.path = p;
-              break;
-            }
-          }
-
-          fs.writeFileSync(
-            path.join(__dirname, "/json/recentvids.json"),
-            JSON.stringify(recentVids)
-          );
-
-          open(directory);
-        });
+                  fs.writeFileSync(
+                    path.join(__dirname, "/json/recentvids.json"),
+                    JSON.stringify(recentVids)
+                  );
+                  open(dirName);
+                }
+              });
+            cmd.run();
+          });
+        }
+      );
     });
 }
 
