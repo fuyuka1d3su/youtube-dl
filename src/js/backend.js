@@ -55,7 +55,7 @@ function showRecentVids() {
     let emptyText = document.getElementById("video empty");
     emptyText.innerHTML = "There are no current recent videos";
   } else {
-    for (var vid of recentVids) {
+    for (let vid of recentVids) {
       // First column
 
       console.log(vid);
@@ -67,10 +67,10 @@ function showRecentVids() {
       let title;
       let img;
       let channelAndTimestamp;
-      // let openDirectory;
-      // let openInBrowser;
-      // let copyLinkVid;
-      // let deleteVideoButton;
+      let openDirectory;
+      let openInBrowser;
+      let copyLinkVid;
+      let deleteVideoButton;
       let columnDiv = document.createElement("div");
 
       recentVidContainer.className = "recentVid container";
@@ -110,7 +110,7 @@ function showRecentVids() {
 
       // Open directory in explorer
 
-      let openDirectory = document.createElement("button");
+      openDirectory = document.createElement("button");
       img = document.createElement("img");
       openDirectory.onclick = () => open(path.dirname(vid.path));
       openDirectory.className = "recentVid smallImgButton";
@@ -122,7 +122,7 @@ function showRecentVids() {
 
       // Open URL in browser
 
-      let openInBrowser = document.createElement("button");
+      openInBrowser = document.createElement("button");
       img = document.createElement("img");
       openInBrowser.onclick = function () {
         console.log(vid.url);
@@ -136,8 +136,7 @@ function showRecentVids() {
       columnDiv.append(openInBrowser);
 
       // Copy Button
-
-      let copyLinkVid = document.createElement("button");
+      copyLinkVid = document.createElement("button");
       img = document.createElement("img");
       copyLinkVid.onclick = function () {
         navigator.clipboard.writeText(vid.url);
@@ -154,7 +153,7 @@ function showRecentVids() {
 
       // Delete vid button
 
-      let deleteVideoButton = document.createElement("button");
+      deleteVideoButton = document.createElement("button");
       img = document.createElement("img");
       deleteVideoButton.onclick = () => {
         deleteVideoButton.style.border = "2px solid red";
@@ -262,7 +261,7 @@ function deleteVideo(video) {
 function writeVideo(video) {
   let recentVids = readRecentVids();
 
-  for (var vid of recentVids) {
+  for (let vid of recentVids) {
     if (vid.id == video.id) {
       messageBox({
         title: "Duplicate video found.",
@@ -305,7 +304,7 @@ function downloadAudioOnly(videoToDL, downloadButton) {
           downloadButton.style.border = "2px solid rgb(23, 201, 0)";
           let recentVids = readRecentVids();
 
-          for (var vid of recentVids) {
+          for (let vid of recentVids) {
             if (vid.id == videoToDL.id) {
               vid.path = p;
               break;
@@ -341,7 +340,7 @@ function downloadVideoOnly(videoToDL, downloadButton) {
           downloadButton.style.border = "2px solid rgb(23, 201, 0)";
           let recentVids = readRecentVids();
 
-          for (var vid of recentVids) {
+          for (let vid of recentVids) {
             if (vid.id == videoToDL.id) {
               vid.path = p;
               break;
@@ -467,7 +466,7 @@ function downloadVideoMerged(videoToDL, downloadButton) {
 
                   let recentVids = readRecentVids();
 
-                  for (var vid of recentVids) {
+                  for (let vid of recentVids) {
                     if (vid.id == videoToDL.id) {
                       vid.path = p;
                       break;
