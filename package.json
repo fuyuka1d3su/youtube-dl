@@ -1,8 +1,39 @@
 {
   "name": "setto",
-  "productName": "setto",
+  "productName": "Setto",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "iconUrl": "./src/icon.ico",
+        "icon": "./src/icon.ico"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "Setto",
+            "setupIcon": "./src/icon.ico"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
+  "description": "A sleek YT-DLP GUI Wrapper !",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
