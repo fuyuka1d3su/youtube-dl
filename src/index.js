@@ -1,20 +1,16 @@
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  dialog,
-  nativeTheme,
-} = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const SETTO_PATH = app.getPath("userData");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-if (!fs.existsSync(path.join(__dirname, "json/recentvids.json"))) {
-  fs.writeFile(path.join(__dirname, "json/recentvids.json"), "[]");
+if (!fs.existsSync(path.join(SETTO_PATH, "json/recentvids.json"))) {
+  fs.mkdirSync(path.join(SETTO_PATH, "json/"));
+  fs.writeFileSync(path.join(SETTO_PATH, "json/recentvids.json"), "[]");
 }
 
 const createWindow = () => {
@@ -32,7 +28,8 @@ const createWindow = () => {
       contextIsolation: false,
     },
     autoHideMenuBar: true,
-    icon: path.join(__dirname, "assets/icon.ico"),
+    icon: path.join(__dirname, "icon.ico"),
+    
   });
 
   // and load the index.html of the app.
