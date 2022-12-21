@@ -80,18 +80,16 @@ function showRecentVids() {
       img.src = vid.thumbnail;
       img.className = "recentVid thumbnail";
       columnDiv.append(img);
-
       columnDiv.className = "column";
       recentVidContainer.append(columnDiv);
 
       // Second column (vid info)
-
       columnDiv = document.createElement("div");
 
       // Vid title
       title = document.createElement("h3");
-      if (vid.title.length > 75) {
-        title.innerHTML = vid.title.substr(0, 62) + "...";
+      if (vid.title.length > 50) {
+        title.innerHTML = vid.title.substr(0, 60) + "...";
         title.title = vid.title;
       } else {
         title.innerHTML = vid.title;
@@ -105,23 +103,18 @@ function showRecentVids() {
         vid.channel + "・Added " + timeConverter(vid.dateAdded);
       channelAndTimestamp.className = "recentvid channelAndTime";
       columnDiv.append(channelAndTimestamp);
-
       columnDiv.append(document.createElement("br"));
 
       // Open directory in explorer
-
       openDirectory = document.createElement("button");
       img = document.createElement("img");
       openDirectory.onclick = () => open(path.dirname(vid.path));
       openDirectory.className = "recentVid smallImgButton";
-
       img.src = "./assets/open_folder.png";
-
       openDirectory.append(img);
       columnDiv.append(openDirectory);
 
       // Open URL in browser
-
       openInBrowser = document.createElement("button");
       img = document.createElement("img");
       openInBrowser.onclick = function () {
@@ -129,9 +122,7 @@ function showRecentVids() {
         open(vid.url);
       };
       openInBrowser.className = "recentVid smallImgButton";
-
       img.src = "./assets/open.png";
-
       openInBrowser.append(img);
       columnDiv.append(openInBrowser);
 
@@ -145,9 +136,7 @@ function showRecentVids() {
         copyLinkVid.style.border = "2px solid rgb(61, 0, 117)";
       };
       copyLinkVid.className = "recentVid smallImgButton";
-
       img.src = "./assets/copy.png";
-
       copyLinkVid.append(img);
       columnDiv.append(copyLinkVid);
 
@@ -159,13 +148,12 @@ function showRecentVids() {
         deleteVideoButton.style.border = "2px solid red";
         deleteVideo(vid);
       };
-
       deleteVideoButton.className = "recentVid smallImgButton";
-
       img.src = "./assets/delete.png";
-
       deleteVideoButton.append(img);
       columnDiv.append(deleteVideoButton);
+
+      
 
       // Download vid+audio merged button
 
@@ -329,7 +317,7 @@ function downloadVideoOnly(videoToDL, downloadButton) {
   // gets the best video using yt-dlp and returns the path it saved it to
   ipcRenderer
     .invoke("showSaveDialog", {
-      defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".flac",
+      defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".mp4",
     })
     .then((p) => {
       if (p) {
@@ -397,7 +385,11 @@ function getBestAudio(video, p) {
       output: p,
     })
       .catch(function (error) {
-        console.log(error);
+        messageBox({
+          title: "An error occured",
+          type: "error",
+          message: error.toString(),
+        });
         reject(false);
       })
       .then(() => {
@@ -444,7 +436,11 @@ function downloadVideoMerged(videoToDL, downloadButton) {
                 console.log("Spawned Ffmpeg with command: " + commandLine);
               })
               .on("error", function (err) {
-                console.log(err);
+                messageBox({
+                  title: "An error occured",
+                  type: "error",
+                  message: err.toString(),
+                });
                 err = true;
               })
               .on("end", () => {
@@ -461,6 +457,11 @@ function downloadVideoMerged(videoToDL, downloadButton) {
 
                 if (err) {
                   downloadButton.style.border = "2px solid red";
+                  messageBox({
+                    title: "An error occured",
+                    type: "error",
+                    message: err.toString(),
+                  });
                 } else {
                   downloadButton.style.border = "2px solid rgb(23, 201, 0)";
 
@@ -485,6 +486,28 @@ function downloadVideoMerged(videoToDL, downloadButton) {
         }
       );
     });
+}
+
+function parseYTDLPOutput(process) {
+  process.stdout.setEncoding("utf8");
+  process.stdout.on("data", function (data) {
+    //Here is where the output goes
+    var info = data.split(" ");
+    if (info[0] === "\r[download]") {
+      if (info[3] != "of") {
+        console.log(info[3]);
+        return info[3];
+      } else {
+        console.log(info[2]);
+        return info[2];
+      }
+    }
+  });
+  process.stderr.on("data", function (data) {
+    //Here is where the output goes
+    console.log(data);
+    return null;
+  });
 }
 
 // Date funcs
