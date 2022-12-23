@@ -6,7 +6,7 @@ const currentDate = new Date().valueOf();
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("@ffprobe-installer/ffprobe").path;
 const ffmpeg = require("fluent-ffmpeg");
-const tempDir = require("os").tmpdir() + "\\" + "setto\\";
+const tempDir = require("os").tmpdir() + "\\" + "Setto\\";
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -15,6 +15,52 @@ showRecentVids();
 function open(path) {
   const shell = require("electron").shell;
   shell.openExternal(path);
+}
+
+// Get the input field
+var input = document.getElementById("search link");
+
+// Execute a function when the user presses a key on the keyboard
+input.addEventListener("keypress", function (event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("searchButton").click();
+  }
+});
+
+function pasteFromClipboard() {
+  const loading = document.getElementById("loading container");
+  loading.style.display = "block"; // Displays the loading animation
+  navigator.clipboard.readText().then((res) => {
+    let link = res;
+    youtubedl(link, {
+      dumpSingleJson: true,
+      noCheckCertificates: true,
+      noWarnings: true,
+      addHeader: ["referer:youtube.com", "user-agent:googlebot"],
+    })
+      .then((output) => {
+        loading.style.display = "none";
+        writeVideo(output);
+        location.reload();
+        console.log(output);
+      })
+      .catch(function (error) {
+        loading.style.display = "none";
+        console.log(error);
+        messageBox({
+          title: "Error while adding video",
+          type: "error",
+          message:
+            'An error occured while adding the video "' +
+            link +
+            '". Make sure you provided a valid link.',
+        });
+      });
+  });
 }
 
 function getVideo() {
@@ -41,7 +87,9 @@ function getVideo() {
         title: "Error while adding video",
         type: "error",
         message:
-          "An error occured while adding the video. Make sure you provided a valid link.",
+            'An error occured while adding the video "' +
+            link +
+            '". Make sure you provided a valid link.',
       });
     });
 }
@@ -152,8 +200,6 @@ function showRecentVids() {
       img.src = "./assets/delete.png";
       deleteVideoButton.append(img);
       columnDiv.append(deleteVideoButton);
-
-      
 
       // Download vid+audio merged button
 
@@ -402,7 +448,6 @@ function downloadVideoMerged(videoToDL, downloadButton) {
   downloadButton.style.border = "2px solid grey";
   let videoFile;
   let audioFile;
-  let outputName;
 
   ipcRenderer
     .invoke("showSaveDialog", {
