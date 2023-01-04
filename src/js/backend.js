@@ -5,10 +5,7 @@ const { ipcRenderer } = require("electron");
 const currentDate = new Date().valueOf();
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("@ffprobe-installer/ffprobe").path;
-const ffmpeg = require("fluent-ffmpeg");
 const tempDir = require("os").tmpdir() + "\\" + "Setto\\";
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
 
 showRecentVids();
 
@@ -420,8 +417,7 @@ function getBestVideo(video, p) {
       output: p,
       resizeBuffer: true,
       format: "bv",
-      ffmpegLocation:
-        "C:\\Users\\akihito\\Documents\\Youtube\\setto\\ffmpeg-bin\\ffmpeg.exe",
+      ffmpegLocation: ffmpegPath,
       verbose: true,
       addMetadata: true,
     })
@@ -441,8 +437,7 @@ function getBestAudio(video, p) {
       resizeBuffer: true,
       format: "ba",
       extractAudio: true,
-      ffmpegLocation:
-        "C:\\Users\\akihito\\Documents\\Youtube\\setto\\ffmpeg-bin\\ffmpeg.exe",
+      ffmpegLocation: ffmpegPath,
       verbose: true,
       resizeBuffer: true,
       addMetadata: true,
