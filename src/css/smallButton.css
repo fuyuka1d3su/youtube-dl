@@ -4,8 +4,8 @@
   border-radius: 15px;
   box-sizing: border-box;
   box-shadow: rgba(0, 0, 0, 0.11) 0 8px 15px;
-  color: #3600c0;
-  background-color: rgb(27, 27, 27);
+  color: #4800ff;
+  background-color: #202020;
   cursor: pointer;
   display: inline-block;
   font-family: Poppins-Regular;
@@ -31,8 +31,8 @@
 }
 
 .smallButton:hover {
-  color: #8400ff;
-  background-color: #1a1a1a;
+  color: #4800ff;
+  background-color: #202020;
   box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
   transform: translateY(-2px);
   border: 2px solid #8400ff
