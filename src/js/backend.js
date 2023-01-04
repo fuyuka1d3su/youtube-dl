@@ -328,6 +328,10 @@ function downloadAudioOnly(videoToDL, downloadButton) {
   ipcRenderer
     .invoke("showSaveDialog", {
       defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".flac",
+      filters: [
+        { name: "Audio Files", extensions: ["mp3", "flac", "wav"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
     })
     .then((p) => {
       if (p) {
@@ -364,6 +368,10 @@ function downloadVideoOnly(videoToDL, downloadButton) {
   ipcRenderer
     .invoke("showSaveDialog", {
       defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".mp4",
+      filters: [
+        { name: "Video Files", extensions: ["mp4", "webm"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
     })
     .then((p) => {
       if (p) {
@@ -452,6 +460,10 @@ function downloadVideoMerged(videoToDL, downloadButton) {
   ipcRenderer
     .invoke("showSaveDialog", {
       defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".mp4",
+      filters: [
+        { name: "Video Files", extensions: ["mp4", "webm"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
     })
     .then((p) => {
       outputName = path.basename(p);
