@@ -87,9 +87,9 @@ function getVideo() {
         title: "Error while adding video",
         type: "error",
         message:
-            'An error occured while adding the video "' +
-            link +
-            '". Make sure you provided a valid link.',
+          'An error occured while adding the video "' +
+          link +
+          '". Make sure you provided a valid link.',
       });
     });
 }
@@ -154,13 +154,15 @@ function showRecentVids() {
       columnDiv.append(document.createElement("br"));
 
       // Open directory in explorer
-      openDirectory = document.createElement("button");
-      img = document.createElement("img");
-      openDirectory.onclick = () => open(path.dirname(vid.path));
-      openDirectory.className = "recentVid smallImgButton";
-      img.src = "./assets/open_folder.png";
-      openDirectory.append(img);
-      columnDiv.append(openDirectory);
+      if (fs.existsSync(vid.path)) {
+        openDirectory = document.createElement("button");
+        img = document.createElement("img");
+        openDirectory.onclick = () => open(path.dirname(vid.path));
+        openDirectory.className = "recentVid smallImgButton";
+        img.src = "./assets/open_folder.png";
+        openDirectory.append(img);
+        columnDiv.append(openDirectory);
+      }
 
       // Open URL in browser
       openInBrowser = document.createElement("button");
@@ -252,6 +254,12 @@ function clearList() {
   }).then((res) => {
     if (res === 0) {
       // if user accepted
+      let recentVids = readRecentVids();
+
+      for (let video of recentVids) {
+        fs.rmSync(video.path);
+      }
+
       fs.writeFileSync(path.join(__dirname, "/json/recentvids.json"), "[]");
       window.location.reload();
     }
@@ -357,6 +365,7 @@ function downloadAudioOnly(videoToDL, downloadButton) {
           open(directory);
         });
       } else {
+        downloadButton.style.border = "2px solid transparent";
         console.log("no path found");
       }
     });
@@ -374,7 +383,9 @@ function downloadVideoOnly(videoToDL, downloadButton) {
       ],
     })
     .then((p) => {
+      // responds with path chosen
       if (p) {
+        // if the path is not null
         getBestVideo(videoToDL, p).then(() => {
           downloadButton.style.border = "2px solid grey";
           let directory = path.dirname(p);
@@ -397,6 +408,7 @@ function downloadVideoOnly(videoToDL, downloadButton) {
           open(directory);
         });
       } else {
+        downloadButton.style.border = "2px solid transparent";
         console.log("no path found");
       }
     });
@@ -456,7 +468,8 @@ function downloadVideoMerged(videoToDL, downloadButton) {
   downloadButton.style.border = "2px solid grey";
   let videoFile;
   let audioFile;
-
+  // yt-dlp --resize-buffer -S "vcodec:h264,acodec:m4a" -f "bv+ba" --merge-output-format "mp4" "https://www.youtube.com/watch?v=-0eGnfMEqYE"
+  //
   ipcRenderer
     .invoke("showSaveDialog", {
       defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".mp4",
@@ -466,11 +479,14 @@ function downloadVideoMerged(videoToDL, downloadButton) {
       ],
     })
     .then((p) => {
-      outputName = path.basename(p);
-      dirName = path.dirname(p);
+      if (p) {
+        outputName = path.basename(p);
+        dirName = path.dirname(p);
 
-      getBestAudio(videoToDL, tempDir + "audio_" + videoToDL.id + ".flac").then(
-        () => {
+        getBestAudio(
+          videoToDL,
+          tempDir + "audio_" + videoToDL.id + ".flac"
+        ).then(() => {
           audioFile = tempDir + "audio_" + videoToDL.id + ".flac";
           console.log(audioFile);
           getBestVideo(
@@ -540,8 +556,11 @@ function downloadVideoMerged(videoToDL, downloadButton) {
               });
             cmd.run();
           });
-        }
-      );
+        });
+      } else {
+        downloadButton.style.border = "2px solid transparent";
+        console.log("no path found");
+      }
     });
 }
 
