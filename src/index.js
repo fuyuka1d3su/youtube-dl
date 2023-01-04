@@ -35,14 +35,13 @@ const createWindow = () => {
     },
     autoHideMenuBar: true,
     icon: path.join(__dirname, "icon.ico"),
-    
   });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "index.html"));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -67,8 +66,7 @@ app.on("activate", () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+// Handlers for MessageBox
 ipcMain.handle("showDialog", (e, options) => {
   let result = dialog.showMessageBoxSync(options);
   return result;
