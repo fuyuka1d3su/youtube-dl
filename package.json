@@ -5,7 +5,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "iconUrl": "./src/icon.ico",
+        "iconUrl": "https://raw.githubusercontent.com/naz-bdeb/youtube-dl/master/src/icon.ico",
         "icon": "./src/icon.ico"
       },
       "makers": [
@@ -13,7 +13,9 @@
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "Setto",
-            "setupIcon": "./src/icon.ico"
+            "setupIcon": "./src/icon.ico",
+            "iconUrl": "https://raw.githubusercontent.com/naz-bdeb/youtube-dl/master/src/icon.ico",
+            "usePackageJson": true
           }
         },
         {
