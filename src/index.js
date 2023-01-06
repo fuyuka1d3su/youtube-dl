@@ -9,7 +9,6 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-
 if (!fs.existsSync(path.join(SETTO_PATH, "json/recentvids.json"))) {
   fs.mkdirSync(path.join(SETTO_PATH, "json/"));
   fs.writeFileSync(path.join(SETTO_PATH, "json/recentvids.json"), "[]");
@@ -76,5 +75,3 @@ ipcMain.handle("showSaveDialog", (e, options) => {
 ipcMain.handle("getUserData", (e) => {
   return SETTO_PATH;
 });
-
-
