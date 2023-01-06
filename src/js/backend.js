@@ -5,21 +5,26 @@ const { ipcRenderer } = require("electron");
 const currentDate = new Date().valueOf();
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("@ffprobe-installer/ffprobe").path;
-const tempDir = path.join(require("os").tmpdir(), "Setto")
-const ffmpeg = require("fluent-ffmpeg")
+const tempDir = path.join(require("os").tmpdir(), "Setto");
+const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
 let SETTO_PATH;
 
-ipcRenderer.invoke("getUserData").then((res)=> {
+ipcRenderer.invoke("getUserData").then((res) => {
   SETTO_PATH = res;
   showRecentVids();
-})
+});
 
 function open(path) {
   const shell = require("electron").shell;
-  shell.openExternal(path);
+  shell.showItemInFolder(path);
+}
+
+function openURL(path) {
+  const shell = require("electron").shell;
+  shell.openExternal(path)
 }
 
 // Get the input field
@@ -162,7 +167,7 @@ function showRecentVids() {
       if (fs.existsSync(vid.path)) {
         openDirectory = document.createElement("button");
         img = document.createElement("img");
-        openDirectory.onclick = () => open(path.dirname(vid.path));
+        openDirectory.onclick = () => open(vid.path);
         openDirectory.className = "recentVid smallImgButton";
         img.src = "./assets/open_folder.png";
         openDirectory.append(img);
@@ -174,7 +179,7 @@ function showRecentVids() {
       img = document.createElement("img");
       openInBrowser.onclick = function () {
         console.log(vid.url);
-        open(vid.url);
+        openURL(vid.url);
       };
       openInBrowser.className = "recentVid smallImgButton";
       img.src = "./assets/open.png";
@@ -255,7 +260,7 @@ function clearList() {
   messageBox({
     title: "Clear list",
     type: "warning",
-    message: "Are you sure you want to clear the recent videos list?",
+    message: "Are you sure you want to clear the recent videos list?\nThis will also delete the videos on your disk.",
     buttons: ["yes", "no"],
   }).then((res) => {
     if (res === 0) {
@@ -351,7 +356,6 @@ function downloadAudioOnly(videoToDL, downloadButton) {
       if (p) {
         getBestAudio(videoToDL, p).then(() => {
           downloadButton.style.border = "2px solid grey";
-          let directory = path.dirname(p);
 
           downloadButton.style.border = "2px solid rgb(23, 201, 0)";
           let recentVids = readRecentVids();
@@ -368,7 +372,7 @@ function downloadAudioOnly(videoToDL, downloadButton) {
             JSON.stringify(recentVids)
           );
 
-          open(directory);
+          open(p);
         });
       } else {
         downloadButton.style.border = "2px solid transparent";
@@ -394,7 +398,6 @@ function downloadVideoOnly(videoToDL, downloadButton) {
         // if the path is not null
         getBestVideo(videoToDL, p).then(() => {
           downloadButton.style.border = "2px solid grey";
-          let directory = path.dirname(p);
 
           downloadButton.style.border = "2px solid rgb(23, 201, 0)";
           let recentVids = readRecentVids();
@@ -408,11 +411,11 @@ function downloadVideoOnly(videoToDL, downloadButton) {
 
           fs.writeFileSync(
             path.join(SETTO_PATH, "/json/recentvids.json"),
-            
+
             JSON.stringify(recentVids)
           );
 
-          open(directory);
+          open(p);
         });
       } else {
         downloadButton.style.border = "2px solid transparent";
@@ -556,7 +559,7 @@ function downloadVideoMerged(videoToDL, downloadButton) {
                     path.join(SETTO_PATH, "/json/recentvids.json"),
                     JSON.stringify(recentVids)
                   );
-                  open(dirName);
+                  open(p);
                 }
               });
             cmd.run();
