@@ -6,7 +6,8 @@
     "forge": {
       "packagerConfig": {
         "iconUrl": "https://raw.githubusercontent.com/naz-bdeb/youtube-dl/master/src/icon.ico",
-        "icon": "./src/icon.ico"
+        "icon": "./src/icon.ico",
+        "executableName": "setto"
       },
       "makers": [
         {
@@ -19,18 +20,22 @@
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "options": {
+              "maintainer": "Nazim Baraka",
+              "homepage": "https://example.com"
+            }
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "config": {
+            "options": {
+              "maintainer": "Nazim Baraka",
+              "homepage": "https://example.com"
+            }
+          }
         }
       ]
     }
@@ -54,7 +59,9 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@ffprobe-installer/ffprobe": "^1.4.1",
     "electron-squirrel-startup": "^1.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "shell": "^0.5.1",
+    "yarn": "^1.22.19",
     "youtube-dl-exec": "^2.1.10"
   },
   "devDependencies": {
