@@ -92,3 +92,5 @@ ffmpeg-bin/
 
 
 src/json/recentvids.json
+
+.vscode
