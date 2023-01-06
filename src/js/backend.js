@@ -5,9 +5,17 @@ const { ipcRenderer } = require("electron");
 const currentDate = new Date().valueOf();
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("@ffprobe-installer/ffprobe").path;
-const tempDir = require("os").tmpdir() + "\\" + "Setto\\";
+const tempDir = path.join(require("os").tmpdir(), "Setto")
+const ffmpeg = require("fluent-ffmpeg")
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
-showRecentVids();
+let SETTO_PATH;
+
+ipcRenderer.invoke("getUserData").then((res)=> {
+  SETTO_PATH = res;
+  showRecentVids();
+})
 
 function open(path) {
   const shell = require("electron").shell;
@@ -233,8 +241,9 @@ function showRecentVids() {
 }
 
 function readRecentVids() {
+  console.log(path.join(SETTO_PATH, "/json/recentvids.json"));
   return JSON.parse(
-    fs.readFileSync(path.join(__dirname, "/json/recentvids.json"))
+    fs.readFileSync(path.join(SETTO_PATH, "/json/recentvids.json"))
   );
 }
 
@@ -257,7 +266,7 @@ function clearList() {
         fs.rmSync(video.path);
       }
 
-      fs.writeFileSync(path.join(__dirname, "/json/recentvids.json"), "[]");
+      fs.writeFileSync(path.join(SETTO_PATH, "/json/recentvids.json"), "[]");
       window.location.reload();
     }
   });
@@ -287,7 +296,7 @@ function deleteVideo(video) {
       console.log(vidToRemove + " to remove");
 
       fs.writeFileSync(
-        path.join(__dirname, "/json/recentvids.json"),
+        path.join(SETTO_PATH, "/json/recentvids.json"),
         JSON.stringify(newRecentVids)
       );
 
@@ -322,7 +331,7 @@ function writeVideo(video) {
   });
 
   fs.writeFileSync(
-    path.join(__dirname, "/json/recentvids.json"),
+    path.join(SETTO_PATH, "/json/recentvids.json"),
     JSON.stringify(recentVids)
   );
 }
@@ -355,7 +364,7 @@ function downloadAudioOnly(videoToDL, downloadButton) {
           }
 
           fs.writeFileSync(
-            path.join(__dirname, "/json/recentvids.json"),
+            path.join(SETTO_PATH, "/json/recentvids.json"),
             JSON.stringify(recentVids)
           );
 
@@ -398,7 +407,8 @@ function downloadVideoOnly(videoToDL, downloadButton) {
           }
 
           fs.writeFileSync(
-            path.join(__dirname, "/json/recentvids.json"),
+            path.join(SETTO_PATH, "/json/recentvids.json"),
+            
             JSON.stringify(recentVids)
           );
 
@@ -543,7 +553,7 @@ function downloadVideoMerged(videoToDL, downloadButton) {
                   }
 
                   fs.writeFileSync(
-                    path.join(__dirname, "/json/recentvids.json"),
+                    path.join(SETTO_PATH, "/json/recentvids.json"),
                     JSON.stringify(recentVids)
                   );
                   open(dirName);
