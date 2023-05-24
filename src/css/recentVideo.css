@@ -16,7 +16,7 @@
 .recentVid.thumbnail {
   height: 150px;
   width: 266.66px;
-  padding: 10px 10px 10px;
+  padding: 10px 10px 5px;
   margin-top: 5px;
   border-radius: 25px;
 }
@@ -24,14 +24,14 @@
   margin-top: 0px;
   margin-bottom: 0px;
   padding-left: 5px;
-  padding-right: 15px;
+  padding-right: 1px;
   float: left;
   width: 100%;
 }
 
 .recentVid.channelAndTime {
   padding-left: 5px;
-  padding-right: 15px;
+  padding-right: 10px;
   float: left;
 }
 
@@ -40,7 +40,7 @@
   border-radius: 15px;
   box-sizing: border-box;
   box-shadow: rgba(0, 0, 0, 0.11) 0 8px 15px;
-  color: #3600c0;
+  color: var(--main-color);
   background-color: rgb(27, 27, 27);
   cursor: pointer;
   line-height: normal;
@@ -74,11 +74,11 @@
 }
 
 .recentVid.smallImgButton:hover {
-  color: #8400ff;
+  color: var(--hover-color);
   background-color: #1a1a1a;
   box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
   transform: translateY(-2px);
-  border: 2px solid #8400ff;
+  border: 2px solid var(--border-color);
 }
 
 .recentVid.smallImgButton:active {
@@ -92,7 +92,7 @@
   border-radius: 15px;
   box-sizing: border-box;
   box-shadow: rgba(0, 0, 0, 0.11) 0 8px 15px;
-  color: #3600c0;
+  color: var(--main-color);
   background-color: rgb(27, 27, 27);
   cursor: pointer;
   font-family: Poppins-Regular;
@@ -121,11 +121,11 @@
 }
 
 .recentVid.download:hover {
-  color: #8400ff;
+  color: var(--hover-color);
   background-color: #1a1a1a;
   box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
   transform: translateY(-2px);
-  border: 2px solid #8400ff;
+  border: 2px solid var(--border-color);
 }
 
 .recentVid.download:active {
