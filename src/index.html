@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="css/recentVideo.css" />
   </head>
   <body>
+    <div id="panel" class="panel" style="display: none">
+      <div class="panel box" id="panelbox" style="display: none">
+        <button class="button" onclick="openPanel()">Panel</button>
+      </div>
+    </div>
+
     <div id="loading container" class="loading container" style="display: none">
       <div
         class="loading icon"
@@ -36,7 +42,7 @@
             id="spinner"
             style="
               fill: transparent;
-              stroke: #4800ff;
+              stroke: var(--main-color);
               stroke-width: 7px;
               stroke-linecap: round;
               filter: url(#shadow);
@@ -59,25 +65,40 @@
         placeholder="Enter the YouTube URL of a video to download"
         id="search link"
         autofocus
-
       />
       <br />
       <br />
-      <button class="button" id="searchButton" onclick="getVideo()">Search</button>
-      <button class="button" onclick="pasteFromClipboard()">Paste from Clipboard</button>
-      <!-- Loading section -->
+      <button class="button" id="searchButton" onclick="getVideo()">
+        Search
+      </button>
+      <button class="button" onclick="pasteFromClipboard()">
+        Paste from Clipboard
+      </button>
+      <button class="button" onclick="openPanel()">Panel</button>
     </div>
-
-    <div></div>
 
     <!-- Sections/Flow -->
 
     <!-- Recent vids container -->
     <br />
     <h1 id="video title">Recent Vids</h1>
+    <p id="video counter"></p>
     <button class="button" onclick="clearList()">Clear</button>
     <p id="video empty"></p>
     <div id="recent container"></div>
   </body>
   <script src="js/backend.js"></script>
+  <script>
+    function openPanel() {
+      let panelContainer = document.getElementById("panel");
+      let panelBox = document.getElementById("panelbox");
+      if (panelContainer.style.display == "block") {
+        panelContainer.style.display = "none";
+        panelBox.style.display = "none";
+      } else {
+        panelContainer.style.display = "block";
+        panelBox.style.display = "block";
+      }
+    }
+  </script>
 </html>
