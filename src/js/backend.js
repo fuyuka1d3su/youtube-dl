@@ -1,30 +1,37 @@
 const youtubedl = require("youtube-dl-exec");
+
 const fs = require("fs");
 const path = require("path");
+
 const { ipcRenderer } = require("electron");
+
 const currentDate = new Date().valueOf();
+
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffprobePath = require("@ffprobe-installer/ffprobe").path;
-const tempDir = path.join(require("os").tmpdir(), "Setto");
 const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
-let SETTO_PATH;
+const tempDir = path.join(require("os").tmpdir(), "Setto");
 
+let SETTO_PATH;
 ipcRenderer.invoke("getUserData").then((res) => {
   SETTO_PATH = res;
   showRecentVids();
 });
 
 function open(path) {
+  // open files in explorer
   const shell = require("electron").shell;
+  shell.beep();
   shell.showItemInFolder(path);
 }
 
 function openURL(path) {
+  // open urls in browser
   const shell = require("electron").shell;
-  shell.openExternal(path)
+  shell.openExternal(path);
 }
 
 // Get the input field
@@ -223,7 +230,7 @@ function showRecentVids() {
 
       // Download audio only button
 
-      downloadAudioOnlyButton.innerHTML = "Audio (flac)";
+      downloadAudioOnlyButton.innerHTML = "Audio (mp3)";
       downloadAudioOnlyButton.className = "recentVid download";
       downloadAudioOnlyButton.onclick = () =>
         downloadAudioOnly(vid, downloadAudioOnlyButton);
@@ -260,7 +267,8 @@ function clearList() {
   messageBox({
     title: "Clear list",
     type: "warning",
-    message: "Are you sure you want to clear the recent videos list?\nThis will also delete the videos on your disk.",
+    message:
+      "Are you sure you want to clear the recent videos list?\nThis will also delete the videos on your disk.",
     buttons: ["yes", "no"],
   }).then((res) => {
     if (res === 0) {
@@ -299,6 +307,7 @@ function deleteVideo(video) {
       });
 
       console.log(vidToRemove + " to remove");
+      console.log(vidToRemove.path + " to remove");
 
       fs.writeFileSync(
         path.join(SETTO_PATH, "/json/recentvids.json"),
@@ -346,9 +355,9 @@ function downloadAudioOnly(videoToDL, downloadButton) {
   // gets the best video using yt-dlp and returns the path it saved it to
   ipcRenderer
     .invoke("showSaveDialog", {
-      defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".flac",
+      defaultPath: "~/" + videoToDL.title + "[" + videoToDL.id + "]" + ".mp3",
       filters: [
-        { name: "Audio Files", extensions: ["mp3", "flac", "wav"] },
+        { name: "Audio Files", extensions: ["mp3", "mp3", "wav"] },
         { name: "All Files", extensions: ["*"] },
       ],
     })
@@ -452,9 +461,9 @@ function getBestAudio(video, p) {
       extractAudio: true,
       ffmpegLocation: ffmpegPath,
       verbose: true,
-      resizeBuffer: true,
+      formatSort: "acodec:m4a",
       addMetadata: true,
-      audioFormat: "flac",
+      audioFormat: "mp3",
       embedThumbnail: true,
       output: p,
     })
@@ -476,7 +485,7 @@ function downloadVideoMerged(videoToDL, downloadButton) {
   downloadButton.style.border = "2px solid grey";
   let videoFile;
   let audioFile;
-  // yt-dlp --resize-buffer -S "vcodec:h264,acodec:m4a" -f "bv+ba" --merge-output-format "mp4" "https://www.youtube.com/watch?v=-0eGnfMEqYE"
+  // yt-dlp --resize-buffer -S "acodec:m4a" -f "bv+ba" --merge-output-format "mp4" "https://www.youtube.com/watch?v=-0eGnfMEqYE"
   //
   ipcRenderer
     .invoke("showSaveDialog", {
@@ -493,9 +502,9 @@ function downloadVideoMerged(videoToDL, downloadButton) {
 
         getBestAudio(
           videoToDL,
-          tempDir + "audio_" + videoToDL.id + ".flac"
+          tempDir + "audio_" + videoToDL.id + ".mp3"
         ).then(() => {
-          audioFile = tempDir + "audio_" + videoToDL.id + ".flac";
+          audioFile = tempDir + "audio_" + videoToDL.id + ".mp3";
           console.log(audioFile);
           getBestVideo(
             videoToDL,
